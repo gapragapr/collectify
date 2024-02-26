@@ -3,7 +3,7 @@ import User from '../db/models/User.js'
 
 const router = express.Router()
 
-router.delete('deleteUser/:userId', async (req, res) => {
+router.delete('/deleteUser/:userId', async (req, res) => {
     const userId = req.params.userId    
 
     try {

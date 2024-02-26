@@ -1,5 +1,6 @@
 import express from 'express'
 import User from '../db/models/User.js'
+import comparePassword from '../db/functions/comparePassword.js'
 
 const router = express.Router()
 
@@ -15,10 +16,9 @@ router.post('/login', async (req, res) => {
             })
         }
 
-        if (existingUser.password !== password) {
-            return res.status(403).json({
-                message: 'Invalid password'
-            })
+        const match = await comparePassword(password, existingUser.password);
+        if (!match) {
+            return res.status(403).json({ message: 'Invalid password' });
         }
 
         return res.status(200).json({

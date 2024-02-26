@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv'
 import dbConnection from './db/dbConnection.js'
 
 import registerRouter from './routes/registerUser.js'
+import deleteRouter from './routes/deleteUser.js'
 
 dotenv.config()
 
@@ -21,6 +22,8 @@ server.use(express.json())
 dbConnection()
 
 server.use(registerRouter)
+
+server.use(deleteRouter)
 
 
 server.listen(PORT, () => {

@@ -5,6 +5,8 @@ import * as dotenv from 'dotenv'
 
 import dbConnection from './db/dbConnection.js'
 
+import registerRouter from './routes/registerUser.js'
+
 dotenv.config()
 
 const server = express()
@@ -17,6 +19,9 @@ server.use(bodyParser.json())
 server.use(express.json())
 
 dbConnection()
+
+server.use(registerRouter)
+
 
 server.listen(PORT, () => {
     console.log(`server started at ${PORT} port`)

@@ -16,11 +16,8 @@ const adminSchema = new mongoose.Schema({
         required: true
     },
     role: {
-        type: [String],
-        default: [
-            'user',
-            'admin'
-        ]
+        type: String,
+        default: 'admin'
     },
     status: {
         type: String,

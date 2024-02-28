@@ -1,15 +1,14 @@
 import express from 'express'
 import User from '../db/models/User.js'
-import comparePassword from '../db/functions/comparePassword.js'
+import comparePassword from '../functions/comparePassword.js'
 
 const router = express.Router()
 
 router.post('/login', async (req, res) => {
-    const {email, password} = req.body
+    const {userLoginData, password} = req.body
 
     try {
-        const existingUser = await User.findOne({email})
-
+        const existingUser = await User.findOne({ $or: [{email: userLoginData}, {username: userLoginData}]})
         if (!existingUser) {
             return res.status(404).json({
                 message: 'User not finded'
@@ -25,7 +24,7 @@ router.post('/login', async (req, res) => {
             message: 'User is logined'
         })
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             message: 'Iternal server error'
         })
     }

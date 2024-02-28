@@ -1,26 +1,20 @@
 import mongoose from "mongoose";
 
 const collectionItemSchema = new mongoose.Schema({
-    collection: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Collection',
-        required: true
-    },
     collectionItemName: {
         type: String,
         required: true,
         unique: true
     },
     collectionItemTags: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Mixed,
+        required: true,
         ref: 'Tag'
     }],
-    collectionItemCustomFileds: {
-        type: [mongoose.Schema.Types.Mixed],
-        required: false,
-        default: null
-    },
-
+    collectionItemCustomFields: [{
+        type: mongoose.Schema.Types.Mixed,
+        required: false
+    }]
 })
 
 const CollectionItem = mongoose.model('CollectionItem', collectionItemSchema)

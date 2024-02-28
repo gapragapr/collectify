@@ -23,36 +23,20 @@ const adminSchema = new mongoose.Schema({
         type: String,
         default: 'active'
     },
-    rights: {
-        type: [String],
-        default: [
-            'create_collection',
-            'edit_collection',
-            'view_collection',
-            'comment_collection',
-            'like_collection',
-            'delete_user',
-            'block_user',
-            'unblock_user',
-            'change_role',
-            'view_role',
-            'view_status'
-        ]
-    },
-    userCollections: {
-        type: [mongoose.Schema.Types.ObjectId],
-        default: [] 
-    },
-    userComments: {
-        type: [mongoose.Schema.Types.ObjectId],
+    userCollections: [{
+        type: mongoose.Schema.Types.Mixed, 
         default: []
-    },
-    userLikes: {
-        type: [mongoose.Schema.Types.ObjectId],
+    }],
+    userComments: [{
+        type: mongoose.Schema.Types.Mixed,
         default: []
-    }
+    }],
+    userLikes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        default: []
+    }]
 })
 
-const Admin = mongoose.model('Admin', adminSchema)
+const Admin = mongoose.model('User', adminSchema)
 
 export default Admin

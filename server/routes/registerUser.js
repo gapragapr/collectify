@@ -1,6 +1,6 @@
 import express from 'express'
 import User from '../db/models/User.js'
-import hashPassword from '../db/functions/hashPassword.js'
+import hashPassword from '../functions/hashPassword.js'
 
 const router = express.Router()
 
@@ -8,9 +8,14 @@ router.post('/register', async (req, res) => {
     try {
         const { email, username, password } = req.body
 
-        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-        if (existingUser) {
-            return res.status(400).json({ message: 'User with this email or username already exists' });
+        const existingUserEmail = await User.findOne({email});
+        if (existingUserEmail) {
+            return res.status(400).json({ message: 'User with this email already exists' });
+        }
+
+        const existingUserUsername = await User.findOne({username});
+        if (existingUserUsername) {
+            return res.status(400).json({ message: 'User with this username already exists' });
         }
 
         const hashedPassword = await hashPassword(password)

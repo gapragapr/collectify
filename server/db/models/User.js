@@ -23,30 +23,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'active'
     },
-    rights: {
-        type: [String],
-        default: [
-            'create_collection',
-            'edit_collection',
-            'view_collection',
-            'comment_collection',
-            'like_collection',
-            'view_role',
-            'view_status'
-        ]
-    },
-    userCollections: {
-        type: [mongoose.Schema.Types.ObjectId], 
+    userCollections: [{
+        type: mongoose.Schema.Types.Mixed, 
         default: []
-    },
-    userComments: {
-        type: [mongoose.Schema.Types.ObjectId],
+    }],
+    userComments: [{
+        type: mongoose.Schema.Types.Mixed,
         default: []
-    },
-    userLikes: {
-        type: [mongoose.Schema.Types.ObjectId],
+    }],
+    userLikes: [{
+        type: mongoose.Schema.Types.ObjectId,
         default: []
-    }
+    }]
 })
 
 const User = mongoose.model('User', userSchema)

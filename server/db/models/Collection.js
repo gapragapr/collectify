@@ -23,16 +23,12 @@ const collectionSchema = new mongoose.Schema({
         default: null
     },
     collectionItems: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Mixed,
         ref: 'CollectionItem',
         required: true
     }],
-    collectionKit: {
-        type: String,
-        default: null
-    },
     collectionComments: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Mixed,
         ref: 'Comment',
         default: null
     }],

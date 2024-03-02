@@ -1,5 +1,5 @@
-import CollectionItem from "../../models/CollectionItem.js"
-import findTag from "../findTagAction.js"
+import CollectionItem from "../../../models/CollectionItem.js"
+import findTag from "../../findTagAction.js"
 
 const createCollectionItemAction = async (collectionItemData) => {
     const collectionItem = {...collectionItemData, collectionItemTags: []}

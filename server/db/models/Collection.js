@@ -22,6 +22,10 @@ const collectionSchema = new mongoose.Schema({
         required: false,
         default: null
     },
+    collectionCustomFields: {
+        type: [String],
+        required: false
+    },
     collectionItems: [{
         type: mongoose.Schema.Types.Mixed,
         ref: 'CollectionItem',

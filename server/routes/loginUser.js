@@ -9,6 +9,13 @@ router.post('/login', async (req, res) => {
 
     try {
         const existingUser = await User.findOne({ $or: [{email: userLoginData}, {username: userLoginData}]})
+        
+        if (existingUser.status === 'blocked') {
+            return res.status(403).json({
+                message: 'User is bloked'
+            })
+        }
+        
         if (!existingUser) {
             return res.status(404).json({
                 message: 'User not finded'
@@ -16,12 +23,14 @@ router.post('/login', async (req, res) => {
         }
 
         const match = await comparePassword(password, existingUser.password);
+
         if (!match) {
             return res.status(403).json({ message: 'Invalid password' });
         }
 
         return res.status(200).json({
-            message: 'User is logined'
+            ...existingUser._doc,
+            password: undefined
         })
     } catch (error) {
         return res.status(500).json({

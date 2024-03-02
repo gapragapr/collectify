@@ -1,10 +1,10 @@
 import User from "../../models/User.js";
 
-const changeRoleAction = async (userId, newRole) => {
+const changeUserParamAction = async (userId, param, paramValue) => {
     try {
         const user = await User.findOneAndUpdate(
             { _id: userId },
-            { role: newRole },
+            { [param]: paramValue },
             { new: true }
         );
         return true;
@@ -13,4 +13,4 @@ const changeRoleAction = async (userId, newRole) => {
     }
 };
 
-export default changeRoleAction;
+export default changeUserParamAction;

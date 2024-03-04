@@ -7,13 +7,15 @@ import dbConnection from './db/dbConnection.js'
 
 import registerRouter from './routes/registerUser.js'
 import loginRouter from './routes/loginUser.js'
-import getUserRouter from './routes/userRoutes/get/getUser.js'
+import getUserRouter from './routes/get/getUser.js'
 //TODO: написать роут поиска
 
 import createCollectionRouter from './routes/userRoutes/create/createCollection.js'
 import createCollectionItemRouter from './routes/userRoutes/create/createCollectionItem.js'
 import deleteCollectionRouter from './routes/userRoutes/delete/deleteCollection.js'
 import deleteCollectionItemRouter from './routes/userRoutes/delete/deleteCollectionItem.js'
+import commentCollectionRouter from './routes/userRoutes/actions/commentCollection.js'
+import likeCollectionRouter from './routes/userRoutes/actions/likeCollection.js'
 
 import checkAdminRights from './middlewares/checkAdminRights.js'
 import checkCollectionEditRigths from './middlewares/checkCollectionEditRights.js'
@@ -43,6 +45,8 @@ server.use(getUserRouter)
 
 server.use(checkUserStatus)
 server.use(createCollectionRouter)
+server.use(commentCollectionRouter)
+server.use(likeCollectionRouter)
 
 server.use(checkCollectionEditRigths)
 server.use(createCollectionItemRouter)

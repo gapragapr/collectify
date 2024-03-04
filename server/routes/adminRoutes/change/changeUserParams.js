@@ -7,7 +7,7 @@ router.post('/admin/change/userParam/:userId', async (req, res) => {
     const {userId} = req.params
 
     try {
-        await changeUserParamsAction(userId, req.body.param, req.body,paramValue)
+        await changeUserParamsAction(userId, req.body.param, req.body.paramValue)
 
         return res.status(200).json({
             message: "User params changed"

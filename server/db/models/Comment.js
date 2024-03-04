@@ -8,6 +8,10 @@ const commentSchema = new mongoose.Schema({
     commentText: {
         type: String,
         required: true
+    },
+    commentedCollectionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
     }
 })
 

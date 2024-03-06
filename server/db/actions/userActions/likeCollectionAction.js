@@ -21,9 +21,7 @@ const likeCollectionAction = async (collectionId, username, userInitiatorId) => 
             return result
         }
 
-        const isLiked = currentUser.userLikes.includes(collectionId);
-
-        if (isLiked) {
+        if (currentUser.userLikes.includes(collectionId)) {
             currentCollection.collectionLikes -= 1;
             currentUser.userLikes = currentUser.userLikes.filter(id => id != collectionId);
 

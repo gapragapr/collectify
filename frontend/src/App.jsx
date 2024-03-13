@@ -1,34 +1,26 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route } from "react-router-dom"
+import { NextUIProvider } from "@nextui-org/react"
+import { useNavigate } from "react-router-dom"
+
+import Header from "./components/widgets/Header/Header"
+import ContentWrapper from "./components/shared/ContentWrapper/ContentWrapper"
+import Form from "./components/widgets/Form/Form"
 
 function App() {
-  const [count, setCount] = useState(0)
+  const navigate = useNavigate()
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <NextUIProvider navigate={navigate}>
+      <div className="flex items-center flex-col bg-gray-50">
+        <ContentWrapper>
+          <Header />
+          <Routes>
+            <Route path="/*" element={<h1>main</h1>} />
+            <Route path="/form/*" element={<Form/>} />
+          </Routes>
+        </ContentWrapper>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </NextUIProvider>
   )
 }
 

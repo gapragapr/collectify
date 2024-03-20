@@ -130,7 +130,7 @@ const RegisterForm = () => {
               <Input 
                 className='mb-6' 
                 label={'Email'} 
-                type='email' 
+                type='text' 
                 endContent={<EnvelopeIcon className={`w-6 h-full items-center ${formError.email.errorMessage ? 'fill-rose-500' : 'fill-gray-300'}`}/>} 
                 onValueChange={(value) => changeInputHandler(value, 'email')}
                 onBlur={(e) => blurInputHandler(e, 'email')}

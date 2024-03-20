@@ -8,6 +8,9 @@ const useValidation = (value, type) => {
         case 'username': 
             isValid = /^[a-zA-Z0-9]+$/.test(value)
             break;
+        case 'userLoginData':
+            isValid = /^[A-Za-z0-9.@]+$/.test(value)
+            break;
     }
 
     return isValid

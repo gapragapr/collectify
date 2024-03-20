@@ -2,8 +2,9 @@ import { Routes, Route } from "react-router-dom"
 import { NextUIProvider } from "@nextui-org/react"
 import { useNavigate } from "react-router-dom"
 
-import Header from "./components/widgets/Header/Header"
-import ContentWrapper from "./components/shared/ContentWrapper/ContentWrapper"
+import Cookies from "js-cookie"
+
+import PagesWrapper from "./components/shared/PagesWrapper/PagesWrapper"
 import Form from "./components/widgets/Form/Form"
 
 function App() {
@@ -11,14 +12,11 @@ function App() {
 
   return (
     <NextUIProvider navigate={navigate}>
-      <div className="flex items-center flex-col bg-gray-50">
-        <ContentWrapper>
-          <Header />
+      <div className="flex items-center flex-col dark:bg-slate-800 bg-gray-50 min-h-screen">
           <Routes>
-            <Route path="/*" element={<h1>main</h1>} />
+            <Route path="/*" element={<PagesWrapper/>} />
             <Route path="/form/*" element={<Form/>} />
           </Routes>
-        </ContentWrapper>
       </div>
     </NextUIProvider>
   )

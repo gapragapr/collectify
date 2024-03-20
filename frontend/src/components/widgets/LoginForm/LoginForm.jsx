@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom'
 
 import { useLoginUserMutation } from '../../../api/sharedApi'
 
+import useValidation from '../../../hooks/useValidation'
+
 const LoginForm = () => {
     const [showPassword, setShowPassword] = useState(false)
     const [userData, setUserData] = useState({ userLoginData: null, password: null })
@@ -66,20 +68,44 @@ const LoginForm = () => {
 
     const changeInputHandler = (value, type) => {
         setShowPassword(false)
-        setUserData({
-            ...userData,
-            [type]: value
-        })
-        setFormError({
-            ...formError,
-            [type]: {
-                errorMessage: null
-            }
-        })
+        
+        if (value === '') {
+            setUserData({
+                ...userData,
+                [type]: null
+            })
+            setFormError({
+                ...formError,
+                [type]: {
+                    errorMessage: `Enter ${type}, please`
+                }
+            })
+        }
+        
+        
+        if (useValidation(value, type)) {
+            setUserData({
+                ...userData,
+                [type]: value
+            })
+            setFormError({
+                ...formError,
+                [type]: {
+                    errorMessage: null
+                }
+            })
+        } else {
+            setFormError({
+                ...formError,
+                [type]: {
+                    errorMessage: `Enter valid ${type}, please`
+                }
+            })
+        }
     }
 
-    const blurInputHandler = (inputType) => {
-        if (!userData[inputType]) {
+    const blurInputHandler = (e, inputType) => {
+        if (!userData[inputType] && e.target.value === '') {
             setFormError({
                 ...formError,
                 [inputType]: {
@@ -120,7 +146,7 @@ const LoginForm = () => {
                 type='text' 
                 endContent={<EnvelopeIcon className={`w-6 h-full items-center ${formError.userLoginData.errorMessage ? 'fill-rose-500' : 'fill-gray-300'}`}/>} 
                 onValueChange={(value) => changeInputHandler(value, 'userLoginData')}
-                onBlur={() => blurInputHandler('userLoginData')}
+                onBlur={(e) => blurInputHandler(e, 'userLoginData')}
                 errorMessage={formError.userLoginData.errorMessage}
                 isInvalid={formError.userLoginData.errorMessage !== null}
                 />
@@ -133,7 +159,7 @@ const LoginForm = () => {
                                             <LockClosedIcon onClick={clickLockIconHandler} 
                                                 className={`w-6 h-full items-center ${formError.password.errorMessage ? 'fill-rose-500' : 'fill-gray-300'} cursor-pointer`}/>} 
                 onValueChange={(value) => changeInputHandler(value, 'password')}
-                onBlur={() => blurInputHandler('password')}
+                onBlur={(e) => blurInputHandler(e, 'password')}
                 errorMessage={formError.password.errorMessage}
                 isInvalid={formError.password.errorMessage !== null}
                 />

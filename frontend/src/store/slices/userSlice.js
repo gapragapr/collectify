@@ -1,21 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { sharedApi } from "../../api/sharedApi";
 
-import Cookies from 'js-cookie'
+import { userApi } from "../../api/userApi";
 
 const userSlice = createSlice({
     name: 'userSlice',
     initialState: {
-        user: Cookies.get('user') && JSON.parse(Cookies.get('user')) || null,
-        isLogined: Cookies.get('isLogined') && Boolean(Cookies.get('isLogined')) || false
+        isLogined: localStorage.getItem('isLogined') ? Boolean(localStorage.getItem('isLogined')) : false,
+        user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
     },
     reducers: {
         logout: (state, action) => {
             state.user = null
             state.isLogined = false
 
-            Cookies.remove('isLogined')
-            Cookies.remove('user')
+            localStorage.removeItem('isLogined')
+            localStorage.removeItem('user')
         }
     },
     extraReducers: (builder) => {
@@ -23,15 +23,22 @@ const userSlice = createSlice({
             state.user = action.payload
             state.isLogined = true
 
-            Cookies.set('isLogined', true)
-            Cookies.set('user', JSON.stringify(state.user))
+            localStorage.setItem('isLogined', true)
+            localStorage.setItem('user', JSON.stringify(state.user))
         });
         builder.addMatcher(sharedApi.endpoints.registerUser.matchFulfilled, (state, action) => {
             state.user = action.payload
             state.isLogined = true
 
-            Cookies.set('isLogined', true)
-            Cookies.set('user', JSON.stringify(state.user))
+            localStorage.setItem('isLogined', true)
+            localStorage.setItem('user', JSON.stringify(action.payload))
+        });
+        builder.addMatcher(userApi.endpoints.getCurrentUser.matchFulfilled, (state, action) => {
+            state.user = action.payload
+            state.isLogined = true
+
+            localStorage.setItem('isLogined', true)
+            localStorage.setItem('user', JSON.stringify(state.user))
         })
     }
     

@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.markdown b, .markdown strong {
+    font-weight: bold;
+}
+
+.markdown ul {
+    list-style-type: disc;
+    padding-left: 18px
+}
+
+.markdown a {
+    color: #1b75d0
+}
+
+.markdown h1, .markdown h2, .markdown h3, .markdown h4, .markdown h5, .markdown h6 {
+    font-weight: bold;
+}
+
+.markdown p {
+    margin: 10px 0;
+}

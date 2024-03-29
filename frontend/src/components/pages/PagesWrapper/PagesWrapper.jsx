@@ -1,10 +1,11 @@
 import React from 'react'
-import ContentWrapper from '../ContentWrapper/ContentWrapper'
+import ContentWrapper from '../../shared/ContentWrapper/ContentWrapper'
 import Header from '../../widgets/Header/Header'
 import { Routes, Route } from 'react-router-dom'
 
-import MainPage from '../../pages/MainPage/MainPage'
-import UserPage from '../../pages/UserPage/UserPage'
+import MainPage from '../MainPage/MainPage'
+import UserPage from '../UserPage/UserPage'
+import ViewCollectionPage from '../ViewCollectionPage/ViewCollectionPage'
 
 const PagesWrapper = () => {
     return (
@@ -14,6 +15,7 @@ const PagesWrapper = () => {
             <Routes>
                 <Route path='/' element={<MainPage />} />
                 <Route path='/:username' element={<UserPage />}/>
+                <Route path='/:username/:collectionId/view' element={<ViewCollectionPage />}/>
             </Routes>
         </ContentWrapper>
       </div>

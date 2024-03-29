@@ -8,7 +8,7 @@ import SearchInput from '../../shared/SearchInput/SearchInput'
 
 import { Button } from '@nextui-org/react'
 
-import UserCard from '../UserCard/UserCard'
+import UserWidget from '../UserWidget/UserWidget'
 
 const Header = () => {
     const navigate = useNavigate()
@@ -20,12 +20,12 @@ const Header = () => {
     }
 
     return (
-      <div className='flex flex-nowrap items-center justify-between w-full p-6 box-border'>
+      <div className='flex flex-nowrap items-center justify-between w-full p-3 sm:p-6 box-border'>
         <Link to={'./'}>LOGO</Link>
         <SearchInput />
         {isLogined ? 
           <div>
-            <UserCard user={user} />
+            <UserWidget user={user} />
           </div>
           : 
           <div className='flex'>

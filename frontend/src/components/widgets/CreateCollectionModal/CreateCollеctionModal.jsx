@@ -1,46 +1,55 @@
 import React, { useEffect, useRef } from 'react'
 import {Modal, ModalContent, ModalBody, ModalFooter, Button, Input, Textarea, Select, SelectItem, Accordion, AccordionItem, Chip, Tooltip, useDisclosure} from "@nextui-org/react";
 import { useState } from 'react';
+import useGenerateChipColor from '../../../hooks/useGenerateChipColor';
 
-import { FolderPlusIcon } from '@heroicons/react/24/outline'
+import { FolderPlusIcon, InformationCircleIcon } from '@heroicons/react/24/outline'
 import { useSelector } from 'react-redux';
 import { useCreateCollectionMutation } from '../../../api/userApi';
 
-const CreateCollectionModal = () => {
-    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+const CreateCollectionModal = ({refetch}) => {
+    const {isOpen, onOpen, onClose, onOpenChange} = useDisclosure();
     const {user} = useSelector(state => state.userSlice)
 
     const inputFileRef = useRef(null)
     const inputFieldName = useRef(null)
 
-    const [createCollection, {data}] = useCreateCollectionMutation()
+    const [createCollection, {isLoading, data}] = useCreateCollectionMutation()
 
-    const [collectionQueryDataErrors, setCollectionQueryDataErrors] = useState({
-      collectionName: {
-        errorMessage: null
-      },
-      collectionTopic: {
-        errorMessage: null
-      },
-    })
+    const [collectionQueryDataErrors, setCollectionQueryDataErrors] = useState({ collectionName: { errorMessage: null }, collectionTopic: { errorMessage: null },})
+    const [customField, setCustomField] = useState({ fieldName: null, fieldType: null })
+    const [selectedImage, setSelectedImage] = useState({ url: null });
 
-    const [customField, setCustomField] = useState({
-      fieldName: null,
-      fieldType: null
-    })
+    useEffect(() => {
+      if (data) {
+        setSelectedImage({
+          url: null,
+        })
+        setCollectionQueryData({
+          userInitiatorId: user._id,
+          collectionData: {
+            collectionAuthor: user._id,
+            collectionName: null,
+            collectionDescription: '',
+            collectionTopic: null,
+            collectionCustomFields: []
+          }
+        })
+        onClose()
+        refetch()
+      }
+    }, [data])
 
     const [collectionQueryData, setCollectionQueryData] = useState({
       userInitiatorId: user._id,
       collectionData: {
         collectionAuthor: user._id,
         collectionName: null,
-        collectionDescription: null,
+        collectionDescription: '',
         collectionTopic: null,
         collectionCustomFields: []
       }
     })
-
-    const [selectedImage, setSelectedImage] = useState(null);
 
     const changeCollectionBaseInfoHandler = (e, type) => {
       setCollectionQueryData(prevState => ({
@@ -50,20 +59,27 @@ const CreateCollectionModal = () => {
           [type]: e.target.value
         }
       }))
+      setCollectionQueryDataErrors({
+        ...collectionQueryDataErrors,
+        [type]: {
+          errorMessage: null
+        }
+      })
     }
 
-    const changeFileSpaceHandler = (event) => {
-      if (event.target.files && event.target.files.length > 0){
-        const file = event.target.files[0]
-        const reader = new FileReader()
-
-        reader.onloadend = () => {
-          setSelectedImage(reader.result)
-        };
-
-        reader.readAsDataURL(file);
-      }
-    }
+    const changeFileSpaceHandler = (event, file) => {
+      event.preventDefault();
+    
+      const reader = new FileReader();
+    
+      reader.onloadend = () => {
+        setSelectedImage({
+          url: reader.result,
+        });
+      };
+    
+      reader.readAsDataURL(file);
+    };
 
     const changeCustomFieldInputHandler = (e) => {
       setCustomField({
@@ -109,35 +125,24 @@ const CreateCollectionModal = () => {
     }
 
     const clickCreateCollectionButtonHandler = (onClose) => {
-      createCollection(collectionQueryData)
-      setCollectionQueryData({
-        userInitiatorId: user._id,
-        collectionData: {
-          collectionAuthor: user._id,
-          collectionName: null,
-          collectionDescription: null,
-          collectionTopic: null,
-          collectionCustomFields: []
-        }
-      })
-      onClose()
-    }
+      let updatedFormError = { ...collectionQueryDataErrors };
+      Object.keys(collectionQueryData.collectionData).forEach(key => {
+          if (!collectionQueryData.collectionData[key]) {
+              updatedFormError = {
+                  ...updatedFormError,
+                  [key]: {
+                      errorMessage: `Enter ${key}, please`
+                  }
+              };
+              
+          }
+      });
 
-    const generateChipColor = (fieldType) => {
-      let color;
+      setCollectionQueryDataErrors(updatedFormError);
 
-      switch (fieldType) {
-        case 'String':
-          color = 'success'
-          break;
-        case 'Number': 
-          color = 'secondary'
-          break;
-        case 'Boolean': 
-          color = 'primary'
-          break;
-      }
-      return color
+      if (Array.from(Object.values(collectionQueryData.collectionData)).every(item => item !== null)) {
+        createCollection({...collectionQueryData, collectionImage: selectedImage.url})
+     }
     }
 
     return (
@@ -148,13 +153,24 @@ const CreateCollectionModal = () => {
             {(onClose) => (
               <>
                 <ModalBody className='py-6'>
-                  {!selectedImage && 
-                    <div onClick={() => inputFileRef.current.click()} className='h-80 w-full cursor-pointer flex justify-center items-center rounded-xl border-dashed border-2 border-gray-300 mt-7'>
-                      <span className='text-gray-400 font-bold'>Drop or select image</span>
+                  {!selectedImage.url && 
+                    <div 
+                      onClick={() => inputFileRef.current.click()} 
+                      onDrop={(event) => changeFileSpaceHandler(event, event.dataTransfer.files[0])}
+                      onDragOver={(event) => event.preventDefault()}
+                      className='h-80 w-full cursor-pointer flex justify-center items-center rounded-xl border-dashed border-2 border-gray-300 mt-7'>
+                        <span className='text-gray-400 font-bold'>Drop or select image</span>
                     </div>
                   } 
-                  {selectedImage && <img src={selectedImage} onClick={() => inputFileRef.current.click()} className='h-80 w-full object-cover cursor-pointer' alt="Selected"/>}
-                  <input ref={inputFileRef} onChange={changeFileSpaceHandler} className='hidden' type='file' />
+                  {selectedImage.url && 
+                    <img 
+                      src={selectedImage.url} 
+                      onClick={() => inputFileRef.current.click()} 
+                      onDrop={(event) => changeFileSpaceHandler(event, event.dataTransfer.files[0])}
+                      onDragOver={(event) => event.preventDefault()}
+                      className='h-80 w-full object-cover cursor-pointer' 
+                      alt="Selected"/>}
+                  <input ref={inputFileRef} onChange={(event) => changeFileSpaceHandler(event, event.target.files[0])} className='hidden' type='file' />
                   <Accordion selectionMode='multiple' defaultExpandedKeys={["1"]}>
                     <AccordionItem key={'1'} title={'Base settings'}>
                       <Input 
@@ -166,9 +182,16 @@ const CreateCollectionModal = () => {
                         onChange={(e) => changeCollectionBaseInfoHandler(e, 'collectionName')} /> 
                       <Textarea 
                         label={'Collection description'} 
-                        className='mb-3 font-bold'
+                        className='mb-3 font-bold relative'
                         defaultValue={collectionQueryData.collectionData.collectionDescription || ''}
-                        onChange={(e) => changeCollectionBaseInfoHandler(e, 'collectionDescription')} />
+                        onChange={(e) => changeCollectionBaseInfoHandler(e, 'collectionDescription')}
+                        endContent={
+                          <div className='absolute top-2 right-2'>
+                            <Tooltip offset={-3} closeDelay={0} content={'You can use markdown'}>
+                              <InformationCircleIcon className='w-6 stroke-gray-500' />
+                            </Tooltip>
+                          </div>
+                        }/>
                       <Input 
                         isInvalid={collectionQueryDataErrors.collectionTopic.errorMessage !== null}
                         errorMessage={collectionQueryDataErrors.collectionTopic.errorMessage} 
@@ -184,6 +207,7 @@ const CreateCollectionModal = () => {
                           <SelectItem color='success' variant='flat' key={'String'}>String</SelectItem>
                           <SelectItem color='secondary' variant='flat' key={'Number'}>Number</SelectItem>
                           <SelectItem color='primary' variant='flat' key={'Boolean'}>Boolean</SelectItem>
+                          <SelectItem color='warning' variant='flat' key={'Date'}>Date</SelectItem>
                         </Select>
                       </div>
                       <div>
@@ -191,7 +215,7 @@ const CreateCollectionModal = () => {
                           return (
                             <Tooltip key={index} offset={-5} closeDelay={0} content={item.fieldType}>
                               <Chip 
-                                color={generateChipColor(item.fieldType)} 
+                                color={useGenerateChipColor(item.fieldType)} 
                                 variant={'flat'} 
                                 className='mr-3 mb-3' 
                                 onClose={() => deleteFieldHandler(index)} >
@@ -208,7 +232,7 @@ const CreateCollectionModal = () => {
                   <Button color="danger" variant="light" onPress={onClose}>
                     Close
                   </Button>
-                  <Button color="primary" onPress={() => clickCreateCollectionButtonHandler(onClose)}>
+                  <Button isLoading={isLoading} color="primary" onPress={() => clickCreateCollectionButtonHandler(onClose)}>
                     Create
                   </Button>
                 </ModalFooter>

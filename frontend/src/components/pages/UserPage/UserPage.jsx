@@ -1,61 +1,121 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useGetUserQuery } from '../../../api/sharedApi'
+import { useChangeuserParamsMutation } from '../../../api/adminApi'
+import { useDeleteUserMutation } from '../../../api/adminApi'
+import { useGetCurrentUserQuery } from '../../../api/userApi'
 
-import SectionWrapper from '../../shared/SectionWrapper/SectionWrapper'
+import { useSelector } from 'react-redux'
+
 import CreateCollectionModal from '../../widgets/CreateCollectionModal/CreateCollеctionModal'
+import CollectionCard from '../../widgets/CollectionCard/CollectionCard'
 
-import {Skeleton, Button} from "@nextui-org/react";
+import {Button, Select, SelectItem} from "@nextui-org/react";
 
-import { FolderArrowDownIcon, FolderPlusIcon } from '@heroicons/react/24/outline'
+import { FolderArrowDownIcon } from '@heroicons/react/24/outline'
 
 const UserPage = () => {
   const {username} = useParams()
-  const {data, isError, isLoading} = useGetUserQuery(username)
 
-  const skeletonArray = Array.from({length: 6}, () => '')
+  const [isCurrentUser, setIsCurrentUser] = useState(false)
+
+  const currentUser = useSelector(state => state.userSlice.user)
+
+  const {data: getUserData, isError, refetch} = useGetUserQuery(username)
+  const [changeUserParams, {data: changeUserParamsData}] = useChangeuserParamsMutation()
+  const [deleteUser, {data: deleteUserData}] = useDeleteUserMutation()
+  const {refetch: refetchCurrentUser } = useGetCurrentUserQuery(currentUser?.username)
 
   useEffect(() => {
-    console.log('hello')
+    if (currentUser?.username === username) {
+      setIsCurrentUser(true)
+    } 
   }, [])
 
   useEffect(() => {
-    
+    if (changeUserParamsData){
+      refetch()
+      refetchCurrentUser()
+    }
+  }, [changeUserParamsData])
 
-  }, [data, isLoading, isError])
-  
+  useEffect(() => {
+    if (deleteUserData) {
+      refetch()
+      refetchCurrentUser()
+    }
+  }, [deleteUserData])
+
+  const changeSelectHandler = (e, param) => {
+    changeUserParams({
+      userId: getUserData._id,
+      body: {
+        userInitiatorId: currentUser._id,
+        param: param,
+        paramValue: e.target.value
+      }
+    })
+  }
+
+  const clickDeleteUserButtonHandler = () => {
+    deleteUser({
+      userId: getUserData._id,
+      body: {
+        userInitiatorId: currentUser._id,
+      }
+    })
+  }
 
   return (
-    <div>
-      <SectionWrapper sectionName={'Collections'}>
-        {isLoading ? 
-          <div className='grid xl:grid-cols-3 md:grid-cols-2 gap-14 mt-6'>
-            {skeletonArray.map((_, index) => {
-               return (
-                <div key={index} className='w-full mb-6 hover:scale-[1.01] bg-white shadow-sm cursor-pointer space-y-5 p-4'>
-                  <Skeleton className="rounded-lg">
-                    <div className="h-60  bg-default-300"></div>
-                  </Skeleton>
-                  <div className="space-y-3">
-                  <Skeleton className="w-3/5 rounded-lg">
-                    <div className="h-5 w-3/5 rounded-lg bg-default-200"></div>
-                  </Skeleton>
-                  <Skeleton className="w-4/5 rounded-lg">
-                    <div className="h-5 w-4/5 rounded-lg bg-default-200"></div>
-                  </Skeleton>
-                  <Skeleton className="w-2/5 rounded-lg">  
-                    <div className="h-5 w-2/5 rounded-lg bg-default-300"></div>
-                  </Skeleton>
-                </div>
-               </div>)
-            })}
-          </div> 
-        : null}
-      </SectionWrapper>
-      <div className='w-full mt-6 flex justify-end'>
-        <Button color='primary' endContent={<FolderArrowDownIcon className='w-6'/>} className='mr-6'>Download all as CSV</Button>
-        <CreateCollectionModal />
-      </div>
+    <div className={`min-h-[75vh] flex flex-col justify-between`}>
+      {isError && <div>User not found</div>}
+      {!isError && 
+        <>
+          {currentUser?.role == 'admin' && 
+            <div className='p-3 bg-white rounded-md w-fit'>
+              <div className='flex flex-col'>
+                <p>username: {getUserData?.username}</p>
+                <p className='flex items-center mb-3 mt-3'>role: 
+                  <Select onChange={(e) => changeSelectHandler(e, 'role')} aria-label="User role" className='ml-3 w-32' selectedKeys={[getUserData?.role]}>
+                    <SelectItem key={getUserData?.role}>{getUserData?.role}</SelectItem>
+                    <SelectItem key={getUserData?.role === 'admin' ? 'user' : 'admin'}>{getUserData?.role === 'admin' ? 'user' : 'admin'}</SelectItem>
+                  </Select>
+                </p>
+                <p className='flex items-center mb-6'>status: 
+                  <Select onChange={(e) => changeSelectHandler(e, 'status')} aria-label="User status" className='ml-3 w-32' selectedKeys={[getUserData?.status]}>
+                    <SelectItem key={getUserData?.status}>{getUserData?.status}</SelectItem>
+                    <SelectItem key={getUserData?.status === 'active' ? 'blocked' : 'active'}>{getUserData?.status === 'active' ? 'blocked' : 'active'}</SelectItem>
+                  </Select>  
+                </p>
+                <Button onClick={clickDeleteUserButtonHandler} color='danger'>Delete user</Button>
+              </div>
+            </div>
+          }
+          {getUserData && getUserData.userCollections.length > 0 &&
+            <div className='grid xl:grid-cols-4 lg:grid-cols-2 md:grid-cols-2 gap-5 items-start'>
+              {getUserData.userCollections.map((item, index) => {
+                return (
+                  <CollectionCard refetch={refetch} key={index} collectionData={item} />
+                )
+              })}
+            </div>
+          }
+          {
+            getUserData && getUserData.userCollections.length == 0 &&
+              <div className='w-full h-full flex justify-center items-center'>
+                <p className='mt-[200px]'>NO CONTENT</p>
+              </div>
+          }
+          {isCurrentUser && 
+            <div className='mt-6 flex justify-between'>
+              {getUserData?.userCollections.length > 0 && <Button color='primary' endContent={<FolderArrowDownIcon className='w-6'/>} className='mr-6'>Download all as CSV</Button>}
+              <CreateCollectionModal refetch={refetch} />
+            </div>
+          }
+        </>
+      }
+        
+      
     </div>
   )
 }

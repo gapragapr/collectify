@@ -12,7 +12,8 @@ export const userApi = createApi({
                 url: '/user/create/collection',
                 method: 'POST',
                 body: data
-            })
+            }),
+            invalidatesTags: ['UserCollections']
         }),
         createCollectionItem: builder.mutation({
             query: (data) => ({
@@ -26,7 +27,8 @@ export const userApi = createApi({
                 url: '/user/delete/collection',
                 method: 'DELETE',
                 body: data
-            })
+            }),
+            invalidatesTags: ['UserCollections']
         }),
         deleteCollectionItem: builder.mutation({
             query: (data) => ({
@@ -37,16 +39,21 @@ export const userApi = createApi({
         }),
         commentCollection: builder.mutation({
             query: (data) => ({
-                url: `/${data.username}/${data.collectionId}/comment`,
+                url: data.path,
                 method: 'POST',
-                body: data
+                body: data.body
             })
         }),
         likeCollection: builder.mutation({
             query: (data) => ({
-                url: `/${data.username}/${data.collectionId}/like`,
+                url: data.path,
                 method: 'POST',
-                body: data
+                body: data.body
+            })
+        }),
+        getCurrentUser: builder.query({
+            query: (username) => ({
+                url: `/${username}`
             })
         })
     })
@@ -58,5 +65,6 @@ export const {
     useDeleteCollectionMutation, 
     useDeleteCollectionItemMutation, 
     useCommentCollectionMutation, 
-    useLikeCollectionMutation
+    useLikeCollectionMutation,
+    useGetCurrentUserQuery
 } = userApi

@@ -8,14 +8,14 @@ export const adminApi = createApi({
             query: (data) => ({
                 url: `/admin/change/userParam/${data.userId}`,
                 method: 'POST',
-                body: data
+                body: data.body
             })
         }),
         deleteUser: builder.mutation({
             query: (data) => ({
                 url: `/admin/delete/user/${data.userId}`,
-                method: 'POST',
-                body: data
+                method: 'DELETE',
+                body: data.body
             })
         })
     })

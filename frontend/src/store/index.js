@@ -10,7 +10,7 @@ const rootReducer = combineReducers({
     [sharedApi.reducerPath]: sharedApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
-    userSlice: userSlice
+    userSlice: userSlice,
 })
 
 export const store = configureStore({

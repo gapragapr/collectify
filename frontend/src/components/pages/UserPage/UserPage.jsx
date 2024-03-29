@@ -12,7 +12,6 @@ import CollectionCard from '../../widgets/CollectionCard/CollectionCard'
 
 import {Button, Select, SelectItem} from "@nextui-org/react";
 
-import { FolderArrowDownIcon } from '@heroicons/react/24/outline'
 
 const UserPage = () => {
   const {username} = useParams()
@@ -108,7 +107,6 @@ const UserPage = () => {
           }
           {isCurrentUser && 
             <div className='mt-6 flex justify-between'>
-              {getUserData?.userCollections.length > 0 && <Button color='primary' endContent={<FolderArrowDownIcon className='w-6'/>} className='mr-6'>Download all as CSV</Button>}
               <CreateCollectionModal refetch={refetch} />
             </div>
           }

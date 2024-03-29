@@ -1,9 +1,9 @@
 import User from "../../models/User.js";
 import Comment from "../../models/Comment.js";
 
-const commentCollectionAction = async (collectionId, username, userInitiatorId, commentData) => {
+const commentCollectionAction = async (collectionId, userInitiatorId, username, commentData) => {
     try {
-        const currentUser = await User.findOne({_id: userInitiatorId})
+        let currentUser = await User.findOne({_id: userInitiatorId})
 
         if (currentUser.userComments.find(comment => {return comment.commentedCollectionId == collectionId})) {
             return {
@@ -12,7 +12,7 @@ const commentCollectionAction = async (collectionId, username, userInitiatorId, 
             }
         }
 
-        const currentCollectionAuthor = await User.findOne({username: username})
+        let currentCollectionAuthor = await User.findOne({username: username})
 
         if (!currentCollectionAuthor) {
             return {
@@ -21,26 +21,28 @@ const commentCollectionAction = async (collectionId, username, userInitiatorId, 
             }
         }
 
-        const currentCollection = currentCollectionAuthor.userCollections.find(collection => {
+        const currentCollectionIndex = currentCollectionAuthor.userCollections.findIndex(collection => {
             return collection._id == collectionId
         })
 
-        if (!currentCollection) {
+        if (currentCollectionIndex == -1) {
             return {
                 status: 404,
                 message: 'Collection not found'
             }
         }
 
-        const comment = new Comment({...commentData, commentedCollectionId: collectionId})
+        const comment = new Comment({...commentData, commentAuthorImg: currentUser.avatar, commentedCollectionId: collectionId})
 
+
+        currentUser = await User.findOne({_id: userInitiatorId})
         currentUser.userComments.push(comment)
-        currentCollection.collectionComments.push(comment.commentedCollectionId)
-
         currentUser.markModified('userComments')
         await currentUser.save()
-
-        currentCollectionAuthor.markModified('userCollections')
+        
+        currentCollectionAuthor = await User.findOne({username: username})
+        currentCollectionAuthor.userCollections[currentCollectionIndex].collectionComments.push(comment)
+        currentCollectionAuthor.markModified(`userCollections.${currentCollectionIndex}.collectionComments`)
         await currentCollectionAuthor.save()
 
         return {

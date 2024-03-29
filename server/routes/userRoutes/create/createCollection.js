@@ -5,16 +5,18 @@ import createCollectionAction from '../../../db/actions/userActions/create/creat
 const router = express.Router()
 
 router.post('/user/create/collection', async (req, res) => {
-    const {collectionData, userInitiatorId} = req.body;
+    const {collectionData, collectionImage, userInitiatorId} = req.body;
 
     try {
-        await createCollectionAction(collectionData, userInitiatorId)
+        const user = await createCollectionAction(collectionData, collectionImage, userInitiatorId)
 
         return res.status(200).json({
-            message: 'Collection created!'
+            ...user._doc.userCollections,
+            password: undefined
         })
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             message: 'Iternal server error'
         })

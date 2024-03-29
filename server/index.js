@@ -8,6 +8,10 @@ import dbConnection from './db/dbConnection.js'
 import registerRouter from './routes/registerUser.js'
 import loginRouter from './routes/loginUser.js'
 import getUserRouter from './routes/get/getUser.js'
+import getCollectionRouter from './routes/get/getCollection.js'
+import getLargestCollectionRouter from './routes/get/getLargestCollectionItems.js'
+import getLastCollectionsRouter from './routes/get/getLastCollections.js'
+import getRandomTagsRouter from './routes/get/getRandomTags.js'
 //TODO: написать роут поиска
 
 import createCollectionRouter from './routes/userRoutes/create/createCollection.js'
@@ -24,7 +28,6 @@ import checkUserStatus from './middlewares/checkUserStatus.js'
 import deleteUserRouter from './routes/adminRoutes/delete/deleteUser.js'
 import changeUserParamsRouter from './routes/adminRoutes/change/changeUserParams.js'
 
-
 dotenv.config()
 
 const server = express()
@@ -32,16 +35,19 @@ const server = express()
 const PORT = process.env.PORT || 3000
 
 server.use(cors())
-server.use(bodyParser.urlencoded({extended: false}))
-server.use(bodyParser.json())
+server.use(bodyParser.urlencoded({limit: '50mb', extended: false}))
+server.use(bodyParser.json({limit: '50mb'}))
 server.use(express.json())
 
 dbConnection()
 
 server.use(registerRouter)
 server.use(loginRouter)
-
 server.use(getUserRouter)
+server.use(getCollectionRouter)
+server.use(getLargestCollectionRouter)
+server.use(getLastCollectionsRouter)
+server.use(getRandomTagsRouter)
 
 server.use(checkUserStatus)
 server.use(createCollectionRouter)

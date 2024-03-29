@@ -16,8 +16,8 @@ router.get('/:username', async (req, res) => {
         }
 
         return res.status(200).json({
-            username: user.username,
-            userCollections: user.userCollections
+            ...user._doc,
+            password: undefined
     })
     } catch (error) {
         return res.status(500).json({

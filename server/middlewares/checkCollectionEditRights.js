@@ -5,12 +5,17 @@ const checkCollectionEditRights = async (req, res, next) => {
 
     try {
         const userInitiator = await User.findOne({_id: userInitiatorId})
+
+        if (userInitiator.role === 'admin') {
+            return next()
+        }
+
         const user = await User.findOne({_id: collectionAuthorId})
         const currentCollection = user.userCollections.find(collection => {
             return collection._id == collectionId
         })
 
-        if (currentCollection.collectionAuthor == userInitiatorId || userInitiator.role == 'admin') {
+        if (currentCollection.collectionAuthor == userInitiatorId) {
             return next ()
         }
 

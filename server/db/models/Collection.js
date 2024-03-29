@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 
+import getCurrentTime from "../../functions/getCurrentTime.js";
+import getCurrentDate from "../../functions/getCurrentDate.js";
+
 const collectionSchema = new mongoose.Schema({
     collectionAuthor: {
         type: mongoose.Schema.Types.ObjectId,
@@ -23,7 +26,7 @@ const collectionSchema = new mongoose.Schema({
         default: null
     },
     collectionCustomFields: {
-        type: [String],
+        type: [mongoose.Schema.Types.Mixed],
         required: false
     },
     collectionItems: [{
@@ -36,9 +39,18 @@ const collectionSchema = new mongoose.Schema({
         ref: 'Comment',
         default: null
     }],
-    collectionLikes: {
-        type: Number,
-        default: 0
+    collectionLikes: [{
+        likeAuthor: {
+            type: String
+        }
+    }],
+    collectionCreated: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {
+            date: getCurrentDate(),
+            time: getCurrentTime(),
+
+        }
     }
 })
 

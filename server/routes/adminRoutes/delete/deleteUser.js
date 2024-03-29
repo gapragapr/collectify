@@ -4,7 +4,8 @@ import deleteUser from '../../../db/actions/adminActions/deleteUserAction.js'
 const router = express.Router()
 
 router.delete('/admin/delete/user/:userId', async (req, res) => {
-    const {userId} = req.params   
+    const {userId} = req.params  
+    console.log(userId) 
 
     try {
         const userIsDelete = await deleteUser(userId)

@@ -8,13 +8,14 @@ router.post('/:username/:collectionId/comment', async (req, res) => {
     const {userInitiatorId, commentData} = req.body
 
     try {
-        const commentResult = await commentCollectionAction(collectionId, username, userInitiatorId, commentData)
+        const commentResult = await commentCollectionAction(collectionId, userInitiatorId, username, commentData)
 
         return res.status(commentResult.status).json({
             message: commentResult.message
         })
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             message: 'Iternal server error'
         })
